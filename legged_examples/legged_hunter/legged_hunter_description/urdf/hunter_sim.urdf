@@ -122,9 +122,9 @@
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-2"
-      upper="0.9"
-      effort="21"
+      lower="-0.6"
+      upper="0.6"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -182,9 +182,9 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.0"
-      upper="0.5"
-      effort="21"
+      lower="-0.7"
+      upper="0.7"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -243,9 +243,9 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-1.8"
-      upper="0.8"
-      effort="21"
+      lower="-2.0"
+      upper="0.45"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -302,9 +302,9 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-0.15"
+      lower="0"
       upper="2.0"
-      effort="21"
+      effort="16"
       velocity="21" />
   </joint>
 
@@ -362,8 +362,8 @@
       xyz="0 1 0" />
     <limit
       lower="-1.2"
-      upper="0.95"
-      effort="21"
+      upper="0.8"
+      effort="10"
       velocity="21" />
   </joint>
   <link
@@ -640,9 +640,9 @@
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-0.9"
-      upper="2"
-      effort="21"
+      lower="-0.6"
+      upper="0.6"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -697,9 +697,9 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-0.5"
-      upper="1.0"
-      effort="21"
+      lower="-0.7"
+      upper="0.7"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -755,9 +755,9 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-0.8"
-      upper="1.8"
-      effort="21"
+      lower="-2.0"
+      upper="0.45"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -813,9 +813,9 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-0.15"
+      lower="0"
       upper="2.0"
-      effort="21"
+      effort="16"
       velocity="21" />
   </joint>
   <link
@@ -871,9 +871,9 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-0.8"
-      upper="1.2"
-      effort="21"
+      lower="-1.2"
+      upper="0.8"
+      effort="10"
       velocity="21" />
   </joint>
   <link

@@ -151,6 +151,8 @@ private:
   std::atomic<scalar_t> kd_feet{ 0 };
 
   vector_t defalutJointPos_;
+  vector_t joint_kp_stance_, joint_kd_stance_, joint_kp_swing_, joint_kd_swing_;
+  scalar_t kp_position_, kd_position_;
 
   InverseKinematics inverseKinematics_;
 

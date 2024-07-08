@@ -103,7 +103,7 @@ TargetTrajectories cmdVelToTargetTrajectories(const vector_t& cmdVel, const Syst
 {
   const vector_t currentPose = observation.state.segment<6>(6);
   vector_t VelOffset(3);
-  VelOffset<< 0.15,0,0;
+  VelOffset<< 0.1,0,0;
   const Eigen::Matrix<scalar_t, 3, 1> zyx = currentPose.tail(3);
   vector_t cmdVelRot = getRotationMatrixFromZyxEulerAngles(zyx) * (cmdVel.head(3) - VelOffset.head(3));
   const scalar_t timeToTarget = TIME_TO_TARGET;

@@ -120,6 +120,12 @@ bool LeggedController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHand
 
   // loadEigenMatrix
   loadData::loadEigenMatrix(referenceFile, "defaultJointState", defalutJointPos_);
+  loadData::loadEigenMatrix(referenceFile, "joint_kp_stance", joint_kp_stance_);
+  loadData::loadEigenMatrix(referenceFile, "joint_kd_stance", joint_kd_stance_);
+  loadData::loadEigenMatrix(referenceFile, "joint_kp_swing", joint_kp_swing_);
+  loadData::loadEigenMatrix(referenceFile, "joint_kd_swing", joint_kd_swing_);
+  loadData::loadEigenMatrix(referenceFile, "kp_position", kp_position_);
+  loadData::loadEigenMatrix(referenceFile, "kd_position", kd_position_);
 
   // Configuring an inverse kinematics processing object
   inverseKinematics_.setParam(std::make_shared<PinocchioInterface>(leggedInterface_->getPinocchioInterface()),
@@ -547,6 +553,10 @@ void LeggedController::RetrievingParameters()
   gencoordDim_ = leggedInterface_->getCentroidalModelInfo().generalizedCoordinatesNum;
   dofPerLeg_ = jointDim_ / 2;
   defalutJointPos_.resize(jointDim_);
+  joint_kp_stance_.resize(jointDim_);
+  joint_kd_stance_.resize(jointDim_);
+  joint_kp_swing_.resize(jointDim_);
+  joint_kd_swing_.resize(jointDim_);
 }
 
 void LeggedController::resetMPC()

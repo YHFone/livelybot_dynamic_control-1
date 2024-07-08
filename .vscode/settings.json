@@ -57,6 +57,17 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
-    "atomic": "cpp"
-  }
+    "atomic": "cpp",
+    "*.ipp": "cpp"
+  },
+  "python.autoComplete.extraPaths": [
+    "/home/yhfone/ocs2_ws/devel/lib/python3/dist-packages",
+    "/opt/ros/noetic/lib/python3/dist-packages",
+    "/home/yhfone/ocs2_ws/raisimLib/raisim/linux/lib"
+  ],
+  "python.analysis.extraPaths": [
+    "/home/yhfone/ocs2_ws/devel/lib/python3/dist-packages",
+    "/opt/ros/noetic/lib/python3/dist-packages",
+    "/home/yhfone/ocs2_ws/raisimLib/raisim/linux/lib"
+  ]
 }

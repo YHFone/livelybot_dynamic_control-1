@@ -48,7 +48,7 @@ at www.bridgedp.com.
 
 #include <iostream>
 #include <iomanip>
-
+#include <algorithm>
 namespace ocs2
 {
 namespace legged_robot
@@ -123,6 +123,7 @@ scalar_t SwingTrajectoryPlanner::getXpositionConstraint(size_t leg, scalar_t tim
   auto index = lookup::findIndexInTimeArray(feetTrajsEvents_[leg], time);
   index = std::min((int)(feetTrajsEvents_[leg].size() - 1), index);
   auto val = feetXTrajs_[leg][index].position(time);
+
   return val;
 }
 
@@ -134,6 +135,10 @@ scalar_t SwingTrajectoryPlanner::getYpositionConstraint(size_t leg, scalar_t tim
   auto index = lookup::findIndexInTimeArray(feetTrajsEvents_[leg], time);
   index = std::min((int)(feetTrajsEvents_[leg].size() - 1), index);
   auto val = feetYTrajs_[leg][index].position(time);
+  
+  // if(val > 0.01) val = 0.01;
+  // else if(val < -0.01) val=-0.01;
+
   return val;
 }
 
@@ -180,6 +185,8 @@ void SwingTrajectoryPlanner::update(const ModeSchedule& modeSchedule, const Targ
 
   feet_array_t<vector3_t> last_stance_position = latestStanceposition_;
   feet_array_t<vector3_t> next_stance_position = latestStanceposition_;
+
+
   feet_array_t<int> last_final_idx{};
 
   const auto eesContactFlagStocks = extractContactFlags(modeSequence);
@@ -257,6 +264,7 @@ void SwingTrajectoryPlanner::update(const ModeSchedule& modeSchedule, const Targ
         const scalar_t stanceFinalTime = eventTimes[stanceFinalIndex];
         const scalar_t time_length = stanceFinalTime - stanceStartTime;
 
+
         startStopTime_[j].push_back({ stanceStartTime, stanceFinalTime });
         const std::vector<CubicSpline::Node> x_nodes{
           CubicSpline::Node{ stanceStartTime, next_stance_position[j].x(), 0 },
@@ -317,6 +325,7 @@ void SwingTrajectoryPlanner::genSwingTrajs(int feet, scalar_t current_time, scal
   scalar_t xy_a1 = 0.417;
   scalar_t xy_l1 = 0.650;
   scalar_t xy_k1 = 1.770;
+
   const std::vector<CubicSpline::Node> x_nodes{
     CubicSpline::Node{ start_time, start_pos.x(), 0 },
     CubicSpline::Node{ (1 - xy_a1) * start_time + xy_a1 * stop_time, (1 - xy_l1) * start_pos.x() + xy_l1 * stop_pos.x(),

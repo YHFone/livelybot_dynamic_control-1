@@ -31,6 +31,7 @@ at www.bridgedp.com.
 #include "transmit.h"
 
 #include <std_msgs/Float32MultiArray.h>
+#include "std_msgs/Float32.h"
 #include <math.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include<cmath>
@@ -96,6 +97,7 @@ public:
   void write(const ros::Time& time, const ros::Duration& period) override;
 
   bool start;
+  bool jump_start;
   ros::Time begin;
   // void writedata2file(float pos,float vel,float tau,std::string path);
 private:
@@ -107,6 +109,8 @@ private:
 
   bool setupImu();
   bool setupContactSensor(ros::NodeHandle& nh);
+  
+  
 
   EncosMotorData jointData_[10]{};
   EncosMotorData test_jointData_[10]{};
@@ -128,15 +132,22 @@ private:
 
   std::vector<int> map_index{2, 3, 1, 4, 0, 7, 8, 6, 9, 5};
   // std::vector<int> map_index_12dof{3, 4, 2, 5, 1, 9, 10, 8, 11, 7};
- std::vector<int> map_index_12dof{5, 4, 3, 2, 1,11, 10, 8, 9, 7};
+  std::vector<int> map_index_12dof{5, 4, 3, 2, 1,11, 10, 9, 8, 7};
 
   // std::vector<int> mapPosInURDF = {4, 2, 0, 1, 3, 9, 7, 5, 6, 8};
   // std::vector<int> mapPosInMotor = {2, 3, 1, 4, 0, 7, 8, 6, 9, 5};
   ros::Subscriber odom_sub_;
+  ros::Subscriber jump_test_sub;
+
   sensor_msgs::Imu yesenceIMU_;
     void OdomCallBack(const sensor_msgs::Imu::ConstPtr &odom)
     {
       yesenceIMU_ = *odom;
+    }
+
+    void jump_startCallBack(const std_msgs::Float32::ConstPtr& msg)
+    {
+      jump_start = false;
     }
 
 };

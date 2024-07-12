@@ -6,6 +6,7 @@
 #include <cmath>
 #include <fstream>
 #include <cmath>
+#include "std_msgs/Float32.h"
 
 namespace legged
 {
@@ -39,7 +40,12 @@ bool BridgeHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
 
   read_pos_pub_ = robot_hw_nh.advertise<std_msgs::Float64MultiArray>("read_pos", 10);
   read_vel_pub_ = robot_hw_nh.advertise<std_msgs::Float64MultiArray>("read_vel", 10);
-  read_ff_pub_ = robot_hw_nh.advertise<std_msgs::Float64MultiArray>("read_ff", 10);  
+  read_ff_pub_ = robot_hw_nh.advertise<std_msgs::Float64MultiArray>("read_ff", 10);
+
+  jump_test_sub = ros::NodeHandle().subscribe<std_msgs::Float32>("/reset_estimation", 1,
+                                                                  &BridgeHW::jump_startCallBack, this);    
+  
+  jump_start = true;
   
   start = true;
 
@@ -134,15 +140,15 @@ void BridgeHW::read(const ros::Time &time, const ros::Duration &period)
   imuData_.linear_acc[1] = yesenceIMU_.linear_acceleration.y;
   imuData_.linear_acc[2] = yesenceIMU_.linear_acceleration.z;
 
-  std::vector<std::string> names = hybridJointInterface_.getNames();
-  for (const auto &name : names)
-  {
-    HybridJointHandle handle = hybridJointInterface_.getHandle(name);
-    handle.setFeedforward(0.);
-    handle.setVelocityDesired(0.);
-    handle.setKd(3.0);
-    handle.setKp(0.);
-  }
+  // std::vector<std::string> names = hybridJointInterface_.getNames();
+  // for (const auto &name : names)
+  // {
+  //   HybridJointHandle handle = hybridJointInterface_.getHandle(name);
+  //   handle.setFeedforward(0.);
+  //   handle.setVelocityDesired(0.);
+  //   handle.setKd(3.0);
+  //   handle.setKp(0.);
+  // }
 
 
 }
@@ -154,18 +160,35 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
   // cmd_pos_msg.data.resize(10);
   // cmd_vel_msg.data.resize(10);
   // cmd_ff_msg.data.resize(10);
-  
-  // if(start == true)
+  // double t = 0.0;
+  // if(jump_start == false)
   // {
-  //   start = false;
-  //   begin = ros::Time::now();
-  // }
+  //   if(start == true)
+  //   {
+  //     start = false;
+  //     begin = ros::Time::now();
+  //   }
 
-  // ros::Time time_now = ros::Time::now();
+  //   ros::Time time_now = ros::Time::now();
   
-  // double t = (time_now - begin).toSec();
+  //    t = (time_now - begin).toSec();
+  // }
+  // else 
+  // {
+  //    t = 0;
+  // }
+  
+  // jointData_[0].pos_des_ = 0.0;
+  // jointData_[1].pos_des_ = 0.0;
+  // jointData_[2].pos_des_ = 0.3*cos(4*t) - 0.4;
+  // jointData_[3].pos_des_ = -2*(0.3*cos(4*t) - 0.4);
+  // jointData_[4].pos_des_ = 0-jointData_[3].pos_des_-jointData_[2].pos_des_;
 
-
+  // jointData_[5].pos_des_ = 0.0;
+  // jointData_[6].pos_des_ = 0.0;
+  // jointData_[7].pos_des_ = jointData_[2].pos_des_;
+  // jointData_[8].pos_des_ = jointData_[3].pos_des_;
+  // jointData_[9].pos_des_ = jointData_[4].pos_des_;
 
 
   for (int i = 0; i < 10; ++i)//as the urdf rank
@@ -176,12 +199,12 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
     yksSendcmd_[i].kd_ = jointData_[i].kd_;
     // yksSendcmd_[i].ff_ = jointData_[i].ff_ * test_directionMotor_[i] * 1; 
     
-    // if(i==2 || i==3)
-    // {
-    //   yksSendcmd_[i].kp_ = 0.0;
-    //   yksSendcmd_[i].kd_ = 0.0;
-    // }
-
+    // // if(i==2 || i==3)
+    // // {
+    // //   yksSendcmd_[i].kp_ = 0.0;
+    // //   yksSendcmd_[i].kd_ = 0.0;
+    // // }
+    
     if(i==3 || i==8)
     {
       yksSendcmd_[i].pos_des_ = test_directionMotor_[i]*(jointData_[i].pos_des_ + jointData_[i-1].pos_des_);
@@ -205,7 +228,7 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
     else if(i==1 || i==6)
     {
 
-      yksSendcmd_[i].ff_ = test_directionMotor_[i]*jointData_[i].ff_ * 1;
+      yksSendcmd_[i].ff_ = test_directionMotor_[i]*jointData_[i].ff_ * 0.6;
       // if(i==3)
       // {
       //   // yksSendcmd_[i].ff_ = test_directionMotor_[i]*(1*sin(2*t));
@@ -222,28 +245,41 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
     // {
     //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 0.7;
     // }
-    // else
+    // else 
     // {
-    //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    //   yksSendcmd_[i].ff_ = test_directionMotor_[i]*jointData_[i].ff_ * 0.8;
     // }
+    
+    
+    // // if(i==1 || i==6)
+    // // {
+    // //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 0.7;
+    // // }
+    // // else
+    // // {
+    // //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    // // }
 
     
     
-    // if(i == 2 || i == 7 || i == 3 || i == 8){
-    //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
-    // }
-    // if(i == 1 || i == 6){
-    //       yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
-    // }    
-    // if(i==4 || i == 9)
-    // {
-    //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
-    // }
-    // if(i==0 || i==5)
-    // {
-    //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
-    // }
+    // // if(i == 2 || i == 7 || i == 3 || i == 8){
+    // //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    // // }
+    // // if(i == 1 || i == 6){
+    // //       yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    // // }    
+    // // if(i==4 || i == 9)
+    // // {
+    // //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    // // }
+    // // if(i==0 || i==5)
+    // // {
+    // //   yksSendcmd_[i].ff_ = jointData_[i].ff_ * directionMotor_[i] * 1;
+    // // }
   }
+
+
+ 
   
 
   // for (int i = 0; i < 10; ++i)//as directionMotor_the urdf rank
@@ -268,7 +304,7 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
     //   motorsInterface->fresh_cmd_dynamic_config(yksSendcmd_[i].pos_des_ - yksSendcmd_[i - 1].pos_des_, (yksSendcmd_[i].vel_des_ - yksSendcmd_[i - 1].vel_des_), yksSendcmd_[i].ff_ , yksSendcmd_[i].kp_, yksSendcmd_[i].kd_,map_index_12dof[i]);
     // }
     if(i==4 || i==9){
-      motorsInterface->fresh_cmd_dynamic_config(yksSendcmd_[i].pos_des_, yksSendcmd_[i].vel_des_, yksSendcmd_[i].ff_ *0.5, yksSendcmd_[i].kp_, yksSendcmd_[i].kd_,map_index_12dof[i]);
+      motorsInterface->fresh_cmd_dynamic_config(yksSendcmd_[i].pos_des_, yksSendcmd_[i].vel_des_, yksSendcmd_[i].ff_ *0.3, yksSendcmd_[i].kp_, yksSendcmd_[i].kd_,map_index_12dof[i]);
 
       //  m->fresh_cmd(yksSendcmd_[i].pos_des_, yksSendcmd_[i].vel_des_, std::clamp(yksSendcmd_[i].ff_ * 0,-3. , 3.), yksSendcmd_[i].kp_ , yksSendcmd_[i].kd_ );
     }
@@ -280,12 +316,21 @@ void BridgeHW::write(const ros::Time& time, const ros::Duration& period)
 
   }
 
-  motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[4].pos_des_, -yksSendcmd_[4].vel_des_, -yksSendcmd_[4].ff_*0.5 , yksSendcmd_[4].kp_, yksSendcmd_[4].kd_,0);
-  motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[9].pos_des_,-yksSendcmd_[9].vel_des_,  -yksSendcmd_[9].ff_*0.5 , yksSendcmd_[9].kp_, yksSendcmd_[9].kd_,6);
+  motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[4].pos_des_, -yksSendcmd_[4].vel_des_, -yksSendcmd_[4].ff_*0.3 , yksSendcmd_[4].kp_, yksSendcmd_[4].kd_,0);
+  motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[9].pos_des_,-yksSendcmd_[9].vel_des_,  -yksSendcmd_[9].ff_*0.3 , yksSendcmd_[9].kp_, yksSendcmd_[9].kd_,6);
   // motor *left_tol = motorsInterface->Motors[0];
   // motor *right_tol = motorsInterface->Motors[6];
   // left_tol->fresh_cmd(-yksSendcmd_[4].pos_des_, -yksSendcmd_[4].vel_des_, -yksSendcmd_[4].ff_ * 0, yksSendcmd_[4].kp_, yksSendcmd_[4].kd_);
   // right_tol->fresh_cmd(-yksSendcmd_[9].pos_des_,-yksSendcmd_[9].vel_des_,  -yksSendcmd_[9].ff_ * 0, yksSendcmd_[9].kp_, yksSendcmd_[9].kd_);
+
+  // for (int i = 0; i < 10; ++i)
+  // {
+  //   motorsInterface->fresh_cmd_dynamic_config(yksSendcmd_[i].pos_des_, 0,0, yksSendcmd_[i].kp_, yksSendcmd_[i].kd_,map_index_12dof[i]);
+  // }
+
+  // motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[4].pos_des_, 0, 0 , yksSendcmd_[4].kp_, yksSendcmd_[4].kd_,0);
+  // motorsInterface->fresh_cmd_dynamic_config(-yksSendcmd_[9].pos_des_, 0, 0 , yksSendcmd_[9].kp_, yksSendcmd_[9].kd_,6);
+
 
   motorsInterface->motor_send_2();
   
@@ -307,9 +352,9 @@ bool BridgeHW::setupJoints()
     else
       continue;
     if (joint.first.find("1_joint") != std::string::npos)
-      joint_index = 1;
-    else if (joint.first.find("2_joint") != std::string::npos)
       joint_index = 0;
+    else if (joint.first.find("2_joint") != std::string::npos)
+      joint_index = 1;
     else if (joint.first.find("3_joint") != std::string::npos)
       joint_index = 2;
     else if (joint.first.find("4_joint") != std::string::npos)

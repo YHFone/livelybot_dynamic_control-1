@@ -110,7 +110,7 @@ TargetTrajectories cmdVelToTargetTrajectories(const vector_t& cmdVel, const Syst
   }
   else 
   {
-    VelOffset<< 0.13,0,0;
+    VelOffset<< 0.15,0,0;
   }
   const Eigen::Matrix<scalar_t, 3, 1> zyx = currentPose.tail(3);
   vector_t cmdVelRot = getRotationMatrixFromZyxEulerAngles(zyx) * (cmdVel.head(3) - VelOffset.head(3));

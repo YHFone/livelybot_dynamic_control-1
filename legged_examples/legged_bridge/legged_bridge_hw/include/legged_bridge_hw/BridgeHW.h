@@ -35,6 +35,9 @@ at www.bridgedp.com.
 #include <math.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include<cmath>
+
+#define Mirror
+
 namespace legged
 {
 
@@ -125,7 +128,11 @@ private:
   float transform_CurrentPos[12] = { 0 };
 
   const std::vector<int> directionMotor_{ -1, 1, 1, 1,  -1,  -1, 1, 1, -1, -1, 1, 1 };//65432
+#ifdef Mirror
+  const std::vector<int> test_directionMotor_{ -1, 1, -1, 1,  1,  -1, 1, 1, -1, -1};//65432
+#else
   const std::vector<int> test_directionMotor_{ -1, 1, -1, 1,  1,  -1, 1, -1, 1, -1};//65432
+#endif
 
   float read_baseMotor_[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   float write_baseMotor_[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
